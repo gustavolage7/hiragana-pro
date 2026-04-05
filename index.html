@@ -3,294 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="manifest" href="manifest.json">
-    <title>Hiragana Master Pro</title>
+    <title>Master Hiragana Pro v2.7</title>
     <style>
-        :root { --bg: #f0f2f5; --card: #ffffff; --primary: #6c5ce7; --success: #00b894; --error: #d63031; --text: #2d3436; }
+        :root { --bg: #f8f9fd; --card: #ffffff; --primary: #6c5ce7; --secondary: #a29bfe; --success: #00b894; --error: #d63031; --text: #2d3436; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text); overflow: hidden; }
-        .app-container { background: var(--card); width: 100%; max-width: 500px; height: 100vh; padding: 1.5rem; box-sizing: border-box; text-align: center; display: flex; flex-direction: column; position: relative; }
-        @media (min-height: 600px) { .app-container { height: 95vh; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); } }
-        
+        .app-container { background: var(--card); width: 100%; max-width: 480px; height: 100vh; padding: 20px; box-sizing: border-box; position: relative; display: flex; flex-direction: column; text-align: center; }
+        @media (min-height: 600px) { .app-container { height: 95vh; border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); } }
         .hidden { display: none !important; }
-        button { padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: 0.2s; margin-bottom: 8px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-exit { position: absolute; top: 15px; left: 15px; background: #eee; color: #666; padding: 5px 12px; font-size: 0.8rem; border-radius: 8px; }
+        button { padding: 14px; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; transition: 0.2s; width: 100%; margin-bottom: 10px; font-size: 1rem; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-sec { background: var(--secondary); color: white; }
+        .btn-option { background: white; border: 2px solid #edf2f7; color: #4a5568; }
+        .btn-option.selected { border-color: var(--primary); background: #f3f0ff; color: var(--primary); }
+        .btn-exit { position: absolute; top: 20px; left: 20px; background: #eee; padding: 6px 12px; width: auto; font-size: 0.8rem; z-index: 10; }
+        .main-display { font-size: 4.5rem; color: var(--primary); font-weight: bold; margin: 30px 0; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+        input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        .config-group { background: #f8f9fa; padding: 15px; border-radius: 18px; margin-bottom: 15px; text-align: left; }
+        .config-label { font-size: 0.75rem; font-weight: bold; color: #718096; margin-bottom: 10px; display: block; text-transform: uppercase; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #f8f9fa; padding: 10px; border-radius: 12px; font-size: 0.7rem; margin-top: 10px; }
+        .stats b { display: block; font-size: 1rem; color: var(--primary); }
+        .study-content { text-align: left; padding: 0 10px; flex-grow: 1; overflow-y: auto; margin-top: 10px; scroll-behavior: smooth; }
         
-        .menu-section { background: #f8f9fa; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #eef; }
-        .main-char { font-size: clamp(45px, 11vw, 75px); color: var(--primary); font-weight: bold; margin: 15px 0; min-height: 100px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-speak-small { background: #6c5ce722; color: var(--primary); padding: 8px; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-
-        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 10px; box-sizing: border-box; outline: none; }
+        /* Ajuste solicitado: cursores e hover para feedback visual */
+        .study-item { border-bottom: 1px solid #eee; padding: 8px 0; display: flex; justify-content: space-between; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+        .study-item:active { background: #f0f0f0; }
+        .kana-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+        .kana-card { background: white; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; transition: transform 0.1s; }
+        .kana-card:active { transform: scale(0.95); background: #f3f0ff; }
         
-        .rank-tab-btns { display: flex; gap: 5px; margin-bottom: 10px; }
-        .rank-tab-btns button { flex: 1; padding: 8px; font-size: 0.75rem; margin-bottom: 0; }
-        .active-tab { background: var(--primary) !important; color: white !important; }
-        .ranking-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .ranking-table td { padding: 6px; border-bottom: 1px solid #f1f1f1; }
-        .feedback { font-weight: bold; margin: 10px 0; min-height: 24px; }
-        label { font-size: 0.8rem; font-weight: bold; color: #636e72; display: block; margin-bottom: 5px; }
+        .ranking-wrapper { display: flex; gap: 10px; flex-grow: 1; overflow: hidden; margin: 15px 0; }
+        .ranking-pane { flex: 1; display: flex; flex-direction: column; background: #fcfcfd; border-radius: 12px; padding: 5px; border: 1px solid #f0f0f0; }
+        .ranking-pane h4 { font-size: 0.7rem; margin: 5px 0; text-transform: uppercase; color: var(--primary); }
+        .ranking-scroll { overflow-y: auto; flex-grow: 1; }
+        .ranking-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .ranking-table td { padding: 8px 2px; border-bottom: 1px solid #f0f0f0; }
+        .btn-clear { background: #fff1f1; color: var(--error); font-size: 0.7rem; padding: 8px; border: 1px solid #ffebeb; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <div id="screen-menu">
-            <h1 style="margin: 0 0 5px 0; font-size: 1.5rem;">Hiragana Master</h1>
-            <p style="color: #636e72; margin-bottom: 15px; font-size: 0.9rem;">Analyst Edition v2.2</p>
-            
-            <div style="display: grid; gap: 10px;">
-                <button class="btn-primary" onclick="startMode('chars', 'q', 'a')">1. Desafio de Letras <br><small>(Hiragana → Letra)</small></button>
-                
-                <div class="menu-section">
-                    <label>2. Desafio de Palavras</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-                        <div>
-                            <small>Exibir em:</small>
-                            <button id="btn-show-hira" class="btn-outline active-tab" style="width:100%" onclick="setWordShow('q')">Hiragana</button>
-                            <button id="btn-show-pt" class="btn-outline" style="width:100%" onclick="setWordShow('pt')">Português</button>
-                        </div>
-                        <div>
-                            <small>Responder em:</small>
-                            <button id="btn-ans-pt" class="btn-outline active-tab" style="width:100%" onclick="setWordAns('pt')">PT / Romaji</button>
-                            <button id="btn-ans-hira" class="btn-outline" style="width:100%" onclick="setWordAns('q')">Hiragana</button>
-                        </div>
-                    </div>
-                    <button class="btn-primary" style="width:100%" onclick="launchWordGame()">Iniciar Palavras</button>
-                </div>
-            </div>
+            <h1 style="margin-top: 50px;">Master Hiragana</h1>
+            <button class="btn-main" id="btn-open-words">Desafio de Palavras</button>
+            <button class="btn-sec" id="btn-start-letters">Desafio de Letras (Kanas)</button>
+            <button class="btn-option" id="btn-open-study">Módulo de Estudo</button>
+            <button class="btn-option" id="btn-open-ranking">Ver Ranking</button>
+            <p style="font-size: 0.8rem; color: #666;">v2.7 - Audio Logic Fixed</p>
+        </div>
 
-            <div style="margin-top: 20px;">
-                <div class="rank-tab-btns">
-                    <button id="tab-chars" class="btn-outline active-tab" onclick="switchRankTab('chars')">Rank Letras</button>
-                    <button id="tab-words" class="btn-outline" onclick="switchRankTab('words')">Rank Palavras</button>
-                </div>
-                <table class="ranking-table">
-                    <tbody id="rank-rows"></tbody>
-                </table>
+        <div id="screen-config" class="hidden">
+            <button class="btn-exit" id="btn-back-to-menu">❮ Voltar</button>
+            <h2 style="margin-top: 60px;">Configurar Jogo</h2>
+            <div class="config-group">
+                <span class="config-label">1. O que será exibido?</span>
+                <button id="show-q" class="btn-option selected">Escrita Japonesa (はは)</button>
+                <button id="show-pt" class="btn-option">Tradução Portuguesa (Mãe)</button>
             </div>
+            <div class="config-group">
+                <span class="config-label">2. Como você vai responder?</span>
+                <div id="ans-options-q">
+                    <button id="ans-q-pt" class="btn-option selected">Português (Mãe)</button>
+                    <button id="ans-q-rom" class="btn-option">Romaji (haha)</button>
+                </div>
+                <div id="ans-options-pt" class="hidden">
+                    <button id="ans-pt-q" class="btn-option selected">Escrita Japonesa (はは)</button>
+                </div>
+            </div>
+            <button class="btn-main" id="btn-start-from-config">COMEÇAR DESAFIO</button>
         </div>
 
         <div id="screen-game" class="hidden">
-            <button class="btn-exit" onclick="confirmExit()">❮ Sair</button>
-            <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 0.9rem;">
-                <div id="life-icons">❤️❤️❤️</div>
-                <div>Acertos: <b id="hit-count">0</b></div>
+            <button class="btn-exit" id="btn-exit-game">Sair</button>
+            <div class="stats">
+                <div>Qst<b id="st-total">0</b></div>
+                <div>Hits<b id="st-hits">0</b></div>
+                <div>Vida<b id="st-lives">❤️❤️❤️</b></div>
+                <div>Taxa<b id="st-pct">0%</b></div>
             </div>
-            <div id="category-tag" style="text-transform: uppercase; font-size: 0.7rem; color: #95a5a6; margin-top: 10px;">CATEGORIA</div>
-            
-            <div class="main-char">
-                <span id="char-display">あ</span>
-                <button class="btn-speak-small" onclick="speak(state.current.q)">🔊</button>
-            </div>
-
-            <div id="input-area">
-                <input type="text" id="answer-input" placeholder="Sua resposta..." autocomplete="off" autocapitalize="none" lang="ja">
-                <button class="btn-primary" style="width: 100%" onclick="checkAnswer()">Validar</button>
-            </div>
-            <div id="next-area" class="hidden">
-                <button class="btn-primary" style="width: 100%; background: #f39c12;" onclick="nextQuestion()">Continuar ➔</button>
-            </div>
-            <div id="msg-feedback" class="feedback"></div>
+            <div id="cat-tag" style="margin-top:15px; font-size:0.7rem; color:#999; text-transform: uppercase;">CATEGORIA</div>
+            <div class="main-display" id="display-text">...</div>
+            <input type="text" id="game-input" placeholder="Sua resposta..." autocomplete="off">
+            <button class="btn-main" id="btn-check-answer">Validar</button>
+            <div id="feedback" style="font-weight:bold; margin-top:5px; height: 20px;"></div>
         </div>
 
-        <div id="screen-over" class="hidden">
-            <h2 style="color: var(--error)">Fim de Jogo!</h2>
-            <p>Score: <b id="final-hits">0</b></p>
-            <input type="text" id="player-name" placeholder="Seu Nome">
-            <button class="btn-primary" style="width: 100%" onclick="saveRanking()">Salvar Pontuação</button>
-            <button class="btn-outline" style="width: 100%" onclick="resetToMenu()">Menu Principal</button>
+        <div id="screen-gameover" class="hidden" style="display: flex; flex-direction: column; height: 100%;">
+            <h2 id="go-title" style="margin-top: 40px; margin-bottom: 5px;">Fim de Jogo!</h2>
+            <p style="margin: 5px 0;">Acertos: <b id="final-score">0</b></p>
+            
+            <div id="save-area">
+                <input type="text" id="rank-name" placeholder="Seu nome" maxlength="12">
+                <button class="btn-main" id="btn-save-ranking">Salvar no Ranking</button>
+            </div>
+
+            <div class="ranking-wrapper">
+                <div class="ranking-pane">
+                    <h4>🔡 Letras</h4>
+                    <div class="ranking-scroll">
+                        <table class="ranking-table"><tbody id="ranking-body-letters"></tbody></table>
+                    </div>
+                </div>
+                <div class="ranking-pane">
+                    <h4>📝 Palavras</h4>
+                    <div class="ranking-scroll">
+                        <table class="ranking-table"><tbody id="ranking-body-words"></tbody></table>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-clear" id="btn-clear-ranking">Limpar Rankings</button>
+            <button class="btn-option" id="btn-go-home">Voltar ao Menu</button>
+        </div>
+
+        <div id="screen-study" class="hidden" style="display: flex; flex-direction: column; overflow: hidden; text-align: left;">
+            <button class="btn-exit" id="btn-study-close">❮ Menu</button>
+            <h2 style="margin-top:50px; text-align: center;">Glossário Completo</h2>
+            <div class="study-content" id="study-list-content"></div>
         </div>
     </div>
 
+    <script src="data.js"></script>
+
     <script>
-        // --- WEB AUDIO API (Sintetizador de SFX) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let config = { mode: 'words', show: 'q', ans: 'pt' };
+        let state = { current: null, hits: 0, errors: 0, lives: 3, tries: 3 };
 
-        function playTone(freq, type, duration) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            oscillator.type = type;
-            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            
-            // Fade out rápido para não dar estalo no áudio
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + duration);
-        }
-
-        function playSfxSuccess() {
-            playTone(600, 'sine', 0.1);
-            setTimeout(() => playTone(800, 'sine', 0.15), 100);
-        }
-
-        function playSfxError() {
-            playTone(250, 'sawtooth', 0.3);
-        }
-
-        // --- DADOS ---
-        const KANAS = [{q:'あ', a:'a'}, {q:'い', a:'i'}, {q:'う', a:'u'}, {q:'え', a:'e'}, {q:'お', a:'o'}, {q:'か', a:'ka'}, {q:'き', a:'ki'}, {q:'く', a:'ku'}, {q:'け', a:'ke'}, {q:'こ', a:'ko'}, {q:'さ', a:'sa'}, {q:'し', a:'shi'}, {q:'す', a:'su'}, {q:'せ', a:'se'}, {q:'そ', a:'so'}, {q:'た', a:'ta'}, {q:'ち', a:'chi'}, {q:'つ', a:'tsu'}, {q:'て', a:'te'}, {q:'と', a:'to'}, {q:'な', a:'na'}, {q:'に', a:'ni'}, {q:'ぬ', a:'nu'}, {q:'ね', a:'ne'}, {q:'の', a:'no'}, {q:'は', a:'ha'}, {q:'ひ', a:'hi'}, {q:'ふ', a:'fu'}, {q:'へ', a:'he'}, {q:'ほ', a:'ho'}, {q:'ま', a:'ma'}, {q:'み', a:'mi'}, {q:'む', a:'mu'}, {q:'め', a:'me'}, {q:'も', a:'mo'}, {q:'や', a:'ya'}, {q:'ゆ', a:'yu'}, {q:'よ', a:'yo'}, {q:'ら', a:'ra'}, {q:'り', a:'ri'}, {q:'る', a:'ru'}, {q:'れ', a:'re'}, {q:'ろ', a:'ro'}, {q:'わ', a:'wa'}, {q:'を', a:'wo'}, {q:'ん', a:'n'}];
-        
-        function generateNumbers() {
-            const units = ['', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう'];
-            let nums = [];
-            for(let i=1; i<=100; i++) {
-                let hira = (i === 100) ? 'ひゃく' : (i < 10) ? units[i] : (Math.floor(i/10) > 1 ? units[Math.floor(i/10)] : '') + 'じゅう' + units[i%10];
-                nums.push({q: hira, pt: i.toString(), jp: i.toString(), cat: 'Números'});
-            }
-            return nums;
-        }
-
-        const WORDS_DB = [
-            ...generateNumbers(),
-            {q:'こんにちは', pt:'ola', jp:'konnichiwa', cat:'Saudações'}, {q:'ありがとう', pt:'obrigado', jp:'arigatou', cat:'Saudações'},
-            {q:'ちち', pt:'meu pai', jp:'chichi', cat:'Família'}, {q:'おとうさん', pt:'pai dele', jp:'otousan', cat:'Família'},
-            {q:'はは', pt:'minha mae', jp:'haha', cat:'Família'}, {q:'おかあさん', pt:'mae dela', jp:'okaasan', cat:'Família'},
-            {q:'あか', pt:'vermelho', jp:'aka', cat:'Cores'}, {q:'あお', pt:'azul', jp:'ao', cat:'Cores'},
-            {q:'みず', pt:'agua', jp:'mizu', cat:'Bebida'}, {q:'ごはん', pt:'arroz', jp:'gohan', cat:'Alimento'}
-        ];
-
-        // --- LÓGICA DE ESTADO ---
-        let wordConfig = { show: 'q', ans: 'pt' };
-        let state = { mode: '', showKey: '', ansKey: '', current: null, globalErrors: 0, hits: 0, cooldown: [] };
-        let rankings = { chars: JSON.parse(localStorage.getItem('rank_chars')) || [], words: JSON.parse(localStorage.getItem('rank_words')) || [] };
-
-        function setWordShow(key) {
-            wordConfig.show = key;
-            document.getElementById('btn-show-hira').classList.toggle('active-tab', key === 'q');
-            document.getElementById('btn-show-pt').classList.toggle('active-tab', key === 'pt');
-        }
-
-        function setWordAns(key) {
-            wordConfig.ans = key;
-            document.getElementById('btn-ans-pt').classList.toggle('active-tab', key === 'pt');
-            document.getElementById('btn-ans-hira').classList.toggle('active-tab', key === 'q');
-        }
-
-        function launchWordGame() { startMode('words', wordConfig.show, wordConfig.ans); }
-
-        function startMode(mode, showKey, ansKey) {
-            speak(""); 
-            if (audioCtx.state === 'suspended') audioCtx.resume(); // Desbloqueia o SFX no mobile
-            
-            state = { mode, showKey, ansKey, hits: 0, globalErrors: 0, cooldown: [] };
-            document.getElementById('screen-menu').classList.add('hidden');
-            document.getElementById('screen-game').classList.remove('hidden');
-            nextQuestion();
-        }
-
-        function nextQuestion() {
-            const list = state.mode === 'chars' ? KANAS : WORDS_DB;
-            let picked = list[Math.floor(Math.random() * list.length)];
-            while(state.cooldown.includes(picked.q)) picked = list[Math.floor(Math.random() * list.length)];
-            
-            state.current = picked;
-            state.cooldown.push(picked.q);
-            if(state.cooldown.length > 10) state.cooldown.shift();
-
-            document.getElementById('char-display').textContent = picked[state.showKey];
-            document.getElementById('category-tag').textContent = picked.cat || 'Hiragana';
-            document.getElementById('answer-input').value = '';
-            document.getElementById('msg-feedback').textContent = '';
-            document.getElementById('input-area').classList.remove('hidden');
-            document.getElementById('next-area').classList.add('hidden');
-            updateStats();
-            document.getElementById('answer-input').focus();
-        }
-
-        function checkAnswer() {
-            const input = document.getElementById('answer-input').value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            
-            let isCorrect = false;
-            if (state.ansKey === 'pt' && state.mode === 'words') {
-                const pt = state.current.pt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                const jp = state.current.jp.toLowerCase();
-                isCorrect = (input === pt || input === jp);
-            } else {
-                const correct = state.current[state.ansKey].toLowerCase();
-                isCorrect = (input === correct);
-            }
-
-            if(isCorrect) {
-                state.hits++;
-                playSfxSuccess(); // Dispara o som de acerto
-                
-                // Aguarda um instante pequeno para que a voz não atropele o som de sucesso
-                setTimeout(() => speak(state.current.q), 200); 
-                
-                document.getElementById('msg-feedback').textContent = "Correto! 🎉";
-                document.getElementById('msg-feedback').style.color = "var(--success)";
-                setTimeout(nextQuestion, 1000);
-            } else {
-                state.globalErrors++;
-                playSfxError(); // Dispara o som de erro
-                
-                document.getElementById('msg-feedback').textContent = `Incorreto! Era: ${state.current[state.ansKey].toUpperCase()}`;
-                document.getElementById('msg-feedback').style.color = "var(--error)";
-                document.getElementById('input-area').classList.add('hidden');
-                updateStats();
-                if(state.globalErrors >= 3) setTimeout(showGameOver, 1500);
-                else document.getElementById('next-area').classList.remove('hidden');
-            }
-        }
-
-        function speak(text) {
+        // --- SISTEMA DE ÁUDIO ---
+        const speak = (text) => {
             if (!window.speechSynthesis) return;
             window.speechSynthesis.cancel(); 
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'ja-JP';
             utterance.rate = 0.8;
             window.speechSynthesis.speak(utterance);
-        }
+        };
 
-        function confirmExit() {
-            if (state.hits > 0) {
-                if (confirm("Você tem acertos nesta partida! Se sair agora, seu progresso será perdido. Deseja sair?")) resetToMenu();
-            } else { resetToMenu(); }
-        }
+        const showScreen = (id) => {
+            document.querySelectorAll('.app-container > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        };
 
-        function showGameOver() {
-            document.getElementById('screen-game').classList.add('hidden');
-            document.getElementById('screen-over').classList.remove('hidden');
-            document.getElementById('final-hits').textContent = state.hits;
-        }
+        const loop = () => {
+            const pool = config.mode === 'words' ? WORDS_DB : KANAS;
+            state.current = pool[Math.floor(Math.random() * pool.length)];
+            state.tries = 3;
+            
+            let displayVal = config.mode === 'letters' ? state.current.q : state.current[config.show];
+            
+            document.getElementById('display-text').textContent = displayVal;
+            document.getElementById('cat-tag').textContent = state.current.cat || 'Letras';
+            document.getElementById('game-input').value = "";
+            document.getElementById('feedback').textContent = "";
+            document.getElementById('game-input').disabled = false;
+            document.getElementById('btn-check-answer').disabled = false;
+            
+            updateStats();
+            document.getElementById('game-input').focus();
+        };
 
-        function saveRanking() {
-            const name = document.getElementById('player-name').value || "Anônimo";
-            rankings[state.mode].push({ name, score: state.hits });
-            rankings[state.mode].sort((a, b) => b.score - a.score);
-            localStorage.setItem(`rank_${state.mode}`, JSON.stringify(rankings[state.mode]));
-            resetToMenu();
-        }
+        const updateStats = () => {
+            document.getElementById('st-hits').textContent = state.hits;
+            document.getElementById('st-total').textContent = state.hits + state.errors;
+            document.getElementById('st-lives').textContent = "❤️".repeat(Math.max(0, state.lives));
+            const total = state.hits + state.errors;
+            document.getElementById('st-pct').textContent = total > 0 ? Math.round((state.hits/total)*100) + "%" : "0%";
+        };
 
-        function resetToMenu() {
-            document.getElementById('screen-game').classList.add('hidden');
-            document.getElementById('screen-over').classList.add('hidden');
-            document.getElementById('screen-menu').classList.remove('hidden');
-            switchRankTab('chars');
-        }
+        const handleCheck = () => {
+            const rawInput = document.getElementById('game-input').value.trim().toLowerCase();
+            const input = rawInput.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let correct = config.mode === 'letters' ? state.current.a : state.current[config.ans].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-        function switchRankTab(type) {
-            document.getElementById('tab-chars').classList.toggle('active-tab', type === 'chars');
-            document.getElementById('tab-words').classList.toggle('active-tab', type === 'words');
-            const rows = rankings[type].slice(0, 5).map((r, i) => `<tr><td>${i+1}º</td><td>${r.name}</td><td>${r.score}</td></tr>`).join('');
-            document.getElementById('rank-rows').innerHTML = rows || '<tr><td colspan="3">Sem recordes</td></tr>';
-        }
+            if(input === correct) {
+                state.hits++;
+                document.getElementById('feedback').textContent = "Correto! 🎉";
+                document.getElementById('feedback').style.color = "var(--success)";
+                document.getElementById('game-input').disabled = true;
+                
+                speak(state.current.q); 
+                
+                setTimeout(loop, 1000);
+            } else {
+                state.tries--;
+                if(state.tries > 0) {
+                    document.getElementById('feedback').textContent = `Tente de novo (${state.tries})`;
+                    document.getElementById('feedback').style.color = "orange";
+                    document.getElementById('game-input').value = "";
+                } else {
+                    state.lives--;
+                    state.errors++;
+                    const displayCorrect = config.mode === 'letters' ? correct : state.current[config.ans];
+                    document.getElementById('feedback').textContent = `Erro! Era: ${displayCorrect}`;
+                    document.getElementById('feedback').style.color = "var(--error)";
+                    document.getElementById('game-input').disabled = true;
+                    
+                    speak(state.current.q);
 
-        function updateStats() {
-            document.getElementById('life-icons').textContent = '❤️'.repeat(3 - state.globalErrors) + '🖤'.repeat(state.globalErrors);
-            document.getElementById('hit-count').textContent = state.hits;
-        }
+                    if(state.lives <= 0) setTimeout(gameOver, 1500);
+                    else setTimeout(loop, 2000);
+                }
+            }
+            updateStats();
+        };
 
-        switchRankTab('chars');
-        document.getElementById('answer-input').addEventListener('keypress', e => e.key === 'Enter' && checkAnswer());
+        const gameOver = () => {
+            document.getElementById('final-score').textContent = state.hits;
+            document.getElementById('save-area').classList.remove('hidden');
+            renderRanking();
+            showScreen('screen-gameover');
+        };
+
+        const renderRanking = () => {
+            const ranksLetters = JSON.parse(localStorage.getItem('hira_ranks_letters') || '[]');
+            const ranksWords = JSON.parse(localStorage.getItem('hira_ranks_words') || '[]');
+            const mapper = (r, i) => `<tr><td style="color:#999">${i+1}</td><td>${r.name}</td><td style="text-align:right"><b>${r.score}</b></td></tr>`;
+            document.getElementById('ranking-body-letters').innerHTML = ranksLetters.map(mapper).join('') || '<tr><td colspan="3">Vazio</td></tr>';
+            document.getElementById('ranking-body-words').innerHTML = ranksWords.map(mapper).join('') || '<tr><td colspan="3">Vazio</td></tr>';
+        };
+
+        // EVENTOS
+        document.getElementById('btn-open-words').onclick = () => { config.mode = 'words'; showScreen('screen-config'); };
+        document.getElementById('btn-start-letters').onclick = () => {
+            config.mode = 'letters'; config.show = 'q'; config.ans = 'a';
+            state.hits = 0; state.errors = 0; state.lives = 3;
+            showScreen('screen-game'); loop();
+        };
+        document.getElementById('btn-open-study').onclick = () => {
+            const list = document.getElementById('study-list-content');
+            let html = `<span class="config-label">Hiraganas (Clique para ouvir)</span><div class="kana-grid">`;
+            KANAS.forEach(k => html += `<div class="kana-card" onclick="speak('${k.q}')"><b>${k.q}</b><br><small>${k.a}</small></div>`);
+            html += `</div><span class="config-label">Vocabulário (Clique para ouvir)</span>`;
+            WORDS_DB.forEach(w => html += `<div class="study-item" onclick="speak('${w.q}')"><b>${w.q}</b> <span>${w.jp} (${w.pt})</span></div>`);
+            list.innerHTML = html;
+            showScreen('screen-study');
+        };
+        document.getElementById('btn-open-ranking').onclick = () => { renderRanking(); document.getElementById('save-area').classList.add('hidden'); showScreen('screen-gameover'); };
+        document.getElementById('show-q').onclick = () => { config.show = 'q'; document.getElementById('show-q').classList.add('selected'); document.getElementById('show-pt').classList.remove('selected'); document.getElementById('ans-options-q').classList.remove('hidden'); document.getElementById('ans-options-pt').classList.add('hidden'); config.ans = 'pt'; };
+        document.getElementById('show-pt').onclick = () => { config.show = 'pt'; document.getElementById('show-pt').classList.add('selected'); document.getElementById('show-q').classList.remove('selected'); document.getElementById('ans-options-q').classList.add('hidden'); document.getElementById('ans-options-pt').classList.remove('hidden'); config.ans = 'q'; };
+        document.getElementById('ans-q-pt').onclick = () => { config.ans = 'pt'; document.getElementById('ans-q-pt').classList.add('selected'); document.getElementById('ans-q-rom').classList.remove('selected'); };
+        document.getElementById('ans-q-rom').onclick = () => { config.ans = 'jp'; document.getElementById('ans-q-rom').classList.add('selected'); document.getElementById('ans-q-pt').classList.remove('selected'); };
+        document.getElementById('btn-start-from-config').onclick = () => { state.hits = 0; state.errors = 0; state.lives = 3; showScreen('screen-game'); loop(); };
+        document.getElementById('btn-check-answer').onclick = handleCheck;
+        document.getElementById('game-input').onkeypress = (e) => { if(e.key === 'Enter') handleCheck(); };
+        document.getElementById('btn-exit-game').onclick = () => { if(confirm("Sair?")) showScreen('screen-menu'); };
+        document.getElementById('btn-back-to-menu').onclick = () => showScreen('screen-menu');
+        document.getElementById('btn-go-home').onclick = () => showScreen('screen-menu');
+        document.getElementById('btn-study-close').onclick = () => showScreen('screen-menu');
+        document.getElementById('btn-save-ranking').onclick = () => {
+            const name = document.getElementById('rank-name').value || "Ninja";
+            const storageKey = config.mode === 'letters' ? 'hira_ranks_letters' : 'hira_ranks_words';
+            const ranks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            ranks.push({name, score: state.hits});
+            ranks.sort((a,b) => b.score - a.score);
+            localStorage.setItem(storageKey, JSON.stringify(ranks.slice(0, 10)));
+            document.getElementById('save-area').classList.add('hidden');
+            renderRanking();
+        };
+        document.getElementById('btn-clear-ranking').onclick = () => {
+            if(confirm("Apagar recordes?")) { localStorage.removeItem('hira_ranks_letters'); localStorage.removeItem('hira_ranks_words'); renderRanking(); }
+        };
     </script>
 </body>
 </html>
