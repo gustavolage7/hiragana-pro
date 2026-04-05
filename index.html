@@ -7,71 +7,85 @@
     <title>Hiragana Master Pro</title>
     <style>
         :root { --bg: #f0f2f5; --card: #ffffff; --primary: #6c5ce7; --success: #00b894; --error: #d63031; --text: #2d3436; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; -webkit-tap-highlight-color: transparent; color: var(--text); }
-        .app-container { background: var(--card); width: 100%; max-width: 500px; height: 100vh; padding: 2rem; box-sizing: border-box; text-align: center; display: flex; flex-direction: column; overflow-y: auto; }
-        @media (min-height: 600px) { .app-container { height: auto; min-height: 90vh; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); } }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text); overflow: hidden; }
+        .app-container { background: var(--card); width: 100%; max-width: 500px; height: 100vh; padding: 1.5rem; box-sizing: border-box; text-align: center; display: flex; flex-direction: column; position: relative; }
+        @media (min-height: 600px) { .app-container { height: 95vh; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); } }
         
         .hidden { display: none !important; }
-        button { padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: 0.2s; margin-bottom: 8px; }
+        button { padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: 0.2s; margin-bottom: 8px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-danger { background: transparent; border: 1px solid #fab1a0; color: #e17055; font-size: 0.8rem; padding: 8px; margin-top: 15px; }
+        .btn-exit { position: absolute; top: 15px; left: 15px; background: #eee; color: #666; padding: 5px 12px; font-size: 0.8rem; border-radius: 8px; }
+        
+        .menu-section { background: #f8f9fa; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #eef; }
+        .main-char { font-size: clamp(45px, 11vw, 75px); color: var(--primary); font-weight: bold; margin: 15px 0; min-height: 100px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-speak-small { background: #6c5ce722; color: var(--primary); padding: 8px; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
 
-        .status-bar { display: flex; justify-content: space-between; background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
-        .main-char { font-size: clamp(60px, 15vw, 90px); color: var(--primary); font-weight: bold; margin: 20px 0; }
         input[type="text"] { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 10px; box-sizing: border-box; outline: none; }
         
         .rank-tab-btns { display: flex; gap: 5px; margin-bottom: 10px; }
-        .rank-tab-btns button { flex: 1; padding: 8px; font-size: 0.8rem; margin-bottom: 0; }
+        .rank-tab-btns button { flex: 1; padding: 8px; font-size: 0.75rem; margin-bottom: 0; }
         .active-tab { background: var(--primary) !important; color: white !important; }
-        
-        .ranking-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .ranking-table td { padding: 8px; border-bottom: 1px solid #f1f1f1; }
+        .ranking-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .ranking-table td { padding: 6px; border-bottom: 1px solid #f1f1f1; }
         .feedback { font-weight: bold; margin: 10px 0; min-height: 24px; }
+        label { font-size: 0.8rem; font-weight: bold; color: #636e72; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <div id="screen-menu">
-            <h1 style="margin-bottom: 5px;">Hiragana Master</h1>
-            <p style="color: #636e72; margin-bottom: 20px;">Sobrevivência PWA</p>
+            <h1 style="margin: 0 0 5px 0; font-size: 1.5rem;">Hiragana Master</h1>
+            <p style="color: #636e72; margin-bottom: 15px; font-size: 0.9rem;">Analyst Edition v2.2</p>
             
-            <div style="display: grid; gap: 5px;">
-                <button class="btn-primary" onclick="startMode('chars')">Desafio das Letras</button>
-                <button class="btn-outline" onclick="toggleWordsMenu()">Desafio das Palavras</button>
-            </div>
-            
-            <div id="words-menu" class="hidden" style="margin-top: 10px; background: #eeefff; padding: 15px; border-radius: 12px;">
-                <p style="margin: 0 0 10px 0; font-size: 0.9rem;">Responder em:</p>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-primary" style="flex:1" onclick="startMode('words', 'pt')">Português</button>
-                    <button class="btn-primary" style="flex:1" onclick="startMode('words', 'jp')">Japonês</button>
+            <div style="display: grid; gap: 10px;">
+                <button class="btn-primary" onclick="startMode('chars', 'q', 'a')">1. Desafio de Letras <br><small>(Hiragana → Letra)</small></button>
+                
+                <div class="menu-section">
+                    <label>2. Desafio de Palavras</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                        <div>
+                            <small>Exibir em:</small>
+                            <button id="btn-show-hira" class="btn-outline active-tab" style="width:100%" onclick="setWordShow('q')">Hiragana</button>
+                            <button id="btn-show-pt" class="btn-outline" style="width:100%" onclick="setWordShow('pt')">Português</button>
+                        </div>
+                        <div>
+                            <small>Responder em:</small>
+                            <button id="btn-ans-pt" class="btn-outline active-tab" style="width:100%" onclick="setWordAns('pt')">PT / Romaji</button>
+                            <button id="btn-ans-hira" class="btn-outline" style="width:100%" onclick="setWordAns('q')">Hiragana</button>
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width:100%" onclick="launchWordGame()">Iniciar Palavras</button>
                 </div>
             </div>
 
-            <div style="margin-top: 30px;">
+            <div style="margin-top: 20px;">
                 <div class="rank-tab-btns">
-                    <button id="tab-chars" class="btn-outline active-tab" onclick="switchRankTab('chars')">Letras</button>
-                    <button id="tab-words" class="btn-outline" onclick="switchRankTab('words')">Palavras</button>
+                    <button id="tab-chars" class="btn-outline active-tab" onclick="switchRankTab('chars')">Rank Letras</button>
+                    <button id="tab-words" class="btn-outline" onclick="switchRankTab('words')">Rank Palavras</button>
                 </div>
                 <table class="ranking-table">
-                    <thead><tr><th>#</th><th>Nome</th><th>Acertos</th></tr></thead>
                     <tbody id="rank-rows"></tbody>
                 </table>
-                <button class="btn-danger" onclick="clearRanking()">Limpar Ranking Local</button>
             </div>
         </div>
 
         <div id="screen-game" class="hidden">
-            <div class="status-bar">
+            <button class="btn-exit" onclick="confirmExit()">❮ Sair</button>
+            <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 0.9rem;">
                 <div id="life-icons">❤️❤️❤️</div>
                 <div>Acertos: <b id="hit-count">0</b></div>
             </div>
-            <div id="category-tag" style="text-transform: uppercase; font-size: 0.7rem; color: #95a5a6;">CATEGORIA</div>
-            <div class="main-char" id="char-display">あ</div>
+            <div id="category-tag" style="text-transform: uppercase; font-size: 0.7rem; color: #95a5a6; margin-top: 10px;">CATEGORIA</div>
+            
+            <div class="main-char">
+                <span id="char-display">あ</span>
+                <button class="btn-speak-small" onclick="speak(state.current.q)">🔊</button>
+            </div>
+
             <div id="input-area">
-                <input type="text" id="answer-input" placeholder="Digite..." autocomplete="off" autocapitalize="none" lang="ja">
+                <input type="text" id="answer-input" placeholder="Sua resposta..." autocomplete="off" autocapitalize="none" lang="ja">
                 <button class="btn-primary" style="width: 100%" onclick="checkAnswer()">Validar</button>
             </div>
             <div id="next-area" class="hidden">
@@ -82,53 +96,91 @@
 
         <div id="screen-over" class="hidden">
             <h2 style="color: var(--error)">Fim de Jogo!</h2>
-            <p>Score final: <b id="final-hits">0</b></p>
+            <p>Score: <b id="final-hits">0</b></p>
             <input type="text" id="player-name" placeholder="Seu Nome">
             <button class="btn-primary" style="width: 100%" onclick="saveRanking()">Salvar Pontuação</button>
-            <button class="btn-outline" style="width: 100%" onclick="resetToMenu()">Voltar ao Início</button>
+            <button class="btn-outline" style="width: 100%" onclick="resetToMenu()">Menu Principal</button>
         </div>
     </div>
 
     <script>
-        // --- BASE DE DADOS ---
+        // --- WEB AUDIO API (Sintetizador de SFX) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            // Fade out rápido para não dar estalo no áudio
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSfxSuccess() {
+            playTone(600, 'sine', 0.1);
+            setTimeout(() => playTone(800, 'sine', 0.15), 100);
+        }
+
+        function playSfxError() {
+            playTone(250, 'sawtooth', 0.3);
+        }
+
+        // --- DADOS ---
         const KANAS = [{q:'あ', a:'a'}, {q:'い', a:'i'}, {q:'う', a:'u'}, {q:'え', a:'e'}, {q:'お', a:'o'}, {q:'か', a:'ka'}, {q:'き', a:'ki'}, {q:'く', a:'ku'}, {q:'け', a:'ke'}, {q:'こ', a:'ko'}, {q:'さ', a:'sa'}, {q:'し', a:'shi'}, {q:'す', a:'su'}, {q:'せ', a:'se'}, {q:'そ', a:'so'}, {q:'た', a:'ta'}, {q:'ち', a:'chi'}, {q:'つ', a:'tsu'}, {q:'て', a:'te'}, {q:'と', a:'to'}, {q:'な', a:'na'}, {q:'に', a:'ni'}, {q:'ぬ', a:'nu'}, {q:'ね', a:'ne'}, {q:'の', a:'no'}, {q:'は', a:'ha'}, {q:'ひ', a:'hi'}, {q:'ふ', a:'fu'}, {q:'へ', a:'he'}, {q:'ほ', a:'ho'}, {q:'ま', a:'ma'}, {q:'み', a:'mi'}, {q:'む', a:'mu'}, {q:'め', a:'me'}, {q:'も', a:'mo'}, {q:'や', a:'ya'}, {q:'ゆ', a:'yu'}, {q:'よ', a:'yo'}, {q:'ら', a:'ra'}, {q:'り', a:'ri'}, {q:'る', a:'ru'}, {q:'れ', a:'re'}, {q:'ろ', a:'ro'}, {q:'わ', a:'wa'}, {q:'を', a:'wo'}, {q:'ん', a:'n'}];
         
         function generateNumbers() {
             const units = ['', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう'];
-            const romajiUnits = ['', 'ichi', 'ni', 'san', 'yon', 'go', 'roku', 'nana', 'hachi', 'kyuu'];
-            const ptUnits = ['', 'um', 'dois', 'tres', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove'];
             let nums = [];
             for(let i=1; i<=100; i++) {
-                if(i === 100) { nums.push({q:'ひゃく', pt:'100', jp:'hyaku', cat:'Número'}); continue; }
-                let hir = '', rom = '', pt = i.toString();
-                if(i < 10) { hir = units[i]; rom = romajiUnits[i]; }
-                else {
-                    let d = Math.floor(i/10), u = i%10;
-                    hir = (d > 1 ? units[d] : '') + 'じゅう' + units[u];
-                    rom = (d > 1 ? romajiUnits[d] : '') + 'juu' + romajiUnits[u];
-                }
-                nums.push({q:hir, pt:pt, jp:rom, cat:'Número'});
+                let hira = (i === 100) ? 'ひゃく' : (i < 10) ? units[i] : (Math.floor(i/10) > 1 ? units[Math.floor(i/10)] : '') + 'じゅう' + units[i%10];
+                nums.push({q: hira, pt: i.toString(), jp: i.toString(), cat: 'Números'});
             }
             return nums;
         }
 
         const WORDS_DB = [
             ...generateNumbers(),
-            {q:'こんにちは', pt:'ola', jp:'konnichiwa', cat:'Saudacao'}, {q:'ありがとう', pt:'obrigado', jp:'arigatou', cat:'Saudacao'},
-            {q:'ちち', pt:'meu pai', jp:'chichi', cat:'Familia (Uchi)'}, {q:'おとうさん', pt:'pai dele', jp:'otousan', cat:'Familia (Soto)'},
-            {q:'はは', pt:'minha mae', jp:'haha', cat:'Familia (Uchi)'}, {q:'おかあさん', pt:'mae dela', jp:'okaasan', cat:'Familia (Soto)'},
-            {q:'ごはん', pt:'arroz', jp:'gohan', cat:'Alimento'}, {q:'みず', pt:'agua', jp:'mizu', cat:'Bebida'},
-            {q:'あか', pt:'vermelho', jp:'aka', cat:'Cor'}, {q:'あお', pt:'azul', jp:'ao', cat:'Cor'}
-            // Nota: Adicione as outras 100 palavras aqui seguindo o padrão
+            {q:'こんにちは', pt:'ola', jp:'konnichiwa', cat:'Saudações'}, {q:'ありがとう', pt:'obrigado', jp:'arigatou', cat:'Saudações'},
+            {q:'ちち', pt:'meu pai', jp:'chichi', cat:'Família'}, {q:'おとうさん', pt:'pai dele', jp:'otousan', cat:'Família'},
+            {q:'はは', pt:'minha mae', jp:'haha', cat:'Família'}, {q:'おかあさん', pt:'mae dela', jp:'okaasan', cat:'Família'},
+            {q:'あか', pt:'vermelho', jp:'aka', cat:'Cores'}, {q:'あお', pt:'azul', jp:'ao', cat:'Cores'},
+            {q:'みず', pt:'agua', jp:'mizu', cat:'Bebida'}, {q:'ごはん', pt:'arroz', jp:'gohan', cat:'Alimento'}
         ];
 
-        // --- CORE LOGIC ---
-        let state = { mode: '', sub: '', current: null, globalErrors: 0, localTries: 3, hits: 0, cooldown: [] };
+        // --- LÓGICA DE ESTADO ---
+        let wordConfig = { show: 'q', ans: 'pt' };
+        let state = { mode: '', showKey: '', ansKey: '', current: null, globalErrors: 0, hits: 0, cooldown: [] };
         let rankings = { chars: JSON.parse(localStorage.getItem('rank_chars')) || [], words: JSON.parse(localStorage.getItem('rank_words')) || [] };
-        let currentRankTab = 'chars';
 
-        function startMode(m, s = '') {
-            state = { mode: m, sub: s, hits: 0, globalErrors: 0, localTries: 3, cooldown: [] };
+        function setWordShow(key) {
+            wordConfig.show = key;
+            document.getElementById('btn-show-hira').classList.toggle('active-tab', key === 'q');
+            document.getElementById('btn-show-pt').classList.toggle('active-tab', key === 'pt');
+        }
+
+        function setWordAns(key) {
+            wordConfig.ans = key;
+            document.getElementById('btn-ans-pt').classList.toggle('active-tab', key === 'pt');
+            document.getElementById('btn-ans-hira').classList.toggle('active-tab', key === 'q');
+        }
+
+        function launchWordGame() { startMode('words', wordConfig.show, wordConfig.ans); }
+
+        function startMode(mode, showKey, ansKey) {
+            speak(""); 
+            if (audioCtx.state === 'suspended') audioCtx.resume(); // Desbloqueia o SFX no mobile
+            
+            state = { mode, showKey, ansKey, hits: 0, globalErrors: 0, cooldown: [] };
             document.getElementById('screen-menu').classList.add('hidden');
             document.getElementById('screen-game').classList.remove('hidden');
             nextQuestion();
@@ -136,17 +188,14 @@
 
         function nextQuestion() {
             const list = state.mode === 'chars' ? KANAS : WORDS_DB;
-            let picked = null;
-            while(!picked) {
-                let temp = list[Math.floor(Math.random() * list.length)];
-                if(!state.cooldown.includes(temp.q)) picked = temp;
-            }
+            let picked = list[Math.floor(Math.random() * list.length)];
+            while(state.cooldown.includes(picked.q)) picked = list[Math.floor(Math.random() * list.length)];
+            
             state.current = picked;
-            state.localTries = 3;
             state.cooldown.push(picked.q);
-            if(state.cooldown.length > 15) state.cooldown.shift();
+            if(state.cooldown.length > 10) state.cooldown.shift();
 
-            document.getElementById('char-display').textContent = picked.q;
+            document.getElementById('char-display').textContent = picked[state.showKey];
             document.getElementById('category-tag').textContent = picked.cat || 'Hiragana';
             document.getElementById('answer-input').value = '';
             document.getElementById('msg-feedback').textContent = '';
@@ -157,41 +206,54 @@
         }
 
         function checkAnswer() {
-            const rawInput = document.getElementById('answer-input').value.trim();
-            if(!rawInput) return;
-
-            let correct;
-            // Se o modo for palavras e o sub-modo for 'jp', a resposta correta é o Hiragana (q)
-            if (state.mode === 'words' && state.sub === 'jp') {
-                correct = state.current.q;
+            const input = document.getElementById('answer-input').value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            let isCorrect = false;
+            if (state.ansKey === 'pt' && state.mode === 'words') {
+                const pt = state.current.pt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const jp = state.current.jp.toLowerCase();
+                isCorrect = (input === pt || input === jp);
             } else {
-                correct = (state.mode === 'chars' ? state.current.a : state.current[state.sub]);
+                const correct = state.current[state.ansKey].toLowerCase();
+                isCorrect = (input === correct);
             }
 
-            const input = rawInput.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const normCorrect = correct.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-            if(input === normCorrect) {
+            if(isCorrect) {
                 state.hits++;
-                speak(state.current.q);
+                playSfxSuccess(); // Dispara o som de acerto
+                
+                // Aguarda um instante pequeno para que a voz não atropele o som de sucesso
+                setTimeout(() => speak(state.current.q), 200); 
+                
                 document.getElementById('msg-feedback').textContent = "Correto! 🎉";
                 document.getElementById('msg-feedback').style.color = "var(--success)";
                 setTimeout(nextQuestion, 1000);
             } else {
-                state.localTries--;
-                if(state.localTries > 0) {
-                    document.getElementById('msg-feedback').textContent = `Incorreto! (${state.localTries} chances)`;
-                    document.getElementById('msg-feedback').style.color = "var(--error)";
-                } else {
-                    state.globalErrors++;
-                    speak(state.current.q);
-                    document.getElementById('msg-feedback').textContent = `Era: ${correct.toUpperCase()}`;
-                    document.getElementById('input-area').classList.add('hidden');
-                    updateStats();
-                    if(state.globalErrors >= 3) setTimeout(showGameOver, 2000);
-                    else document.getElementById('next-area').classList.remove('hidden');
-                }
+                state.globalErrors++;
+                playSfxError(); // Dispara o som de erro
+                
+                document.getElementById('msg-feedback').textContent = `Incorreto! Era: ${state.current[state.ansKey].toUpperCase()}`;
+                document.getElementById('msg-feedback').style.color = "var(--error)";
+                document.getElementById('input-area').classList.add('hidden');
+                updateStats();
+                if(state.globalErrors >= 3) setTimeout(showGameOver, 1500);
+                else document.getElementById('next-area').classList.remove('hidden');
             }
+        }
+
+        function speak(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP';
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function confirmExit() {
+            if (state.hits > 0) {
+                if (confirm("Você tem acertos nesta partida! Se sair agora, seu progresso será perdido. Deseja sair?")) resetToMenu();
+            } else { resetToMenu(); }
         }
 
         function showGameOver() {
@@ -201,50 +263,33 @@
         }
 
         function saveRanking() {
-            const name = document.getElementById('player-name').value || "Jogador";
-            const listKey = state.mode; 
-            rankings[listKey].push({ name, score: state.hits });
-            rankings[listKey].sort((a, b) => b.score - a.score);
-            localStorage.setItem(`rank_${listKey}`, JSON.stringify(rankings[listKey]));
+            const name = document.getElementById('player-name').value || "Anônimo";
+            rankings[state.mode].push({ name, score: state.hits });
+            rankings[state.mode].sort((a, b) => b.score - a.score);
+            localStorage.setItem(`rank_${state.mode}`, JSON.stringify(rankings[state.mode]));
             resetToMenu();
         }
 
-        function clearRanking() {
-            if(confirm("Tem certeza que deseja apagar todos os recordes locais?")) {
-                localStorage.clear();
-                rankings = { chars: [], words: [] };
-                renderRanking(currentRankTab);
-            }
-        }
-
-        function renderRanking(type) {
-            currentRankTab = type;
-            const rows = rankings[type].slice(0, 5).map((r, i) => `<tr><td>${i+1}º</td><td>${r.name}</td><td>${r.score}</td></tr>`).join('');
-            document.getElementById('rank-rows').innerHTML = rows || '<tr><td colspan="3">Sem recordes</td></tr>';
+        function resetToMenu() {
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-over').classList.add('hidden');
+            document.getElementById('screen-menu').classList.remove('hidden');
+            switchRankTab('chars');
         }
 
         function switchRankTab(type) {
             document.getElementById('tab-chars').classList.toggle('active-tab', type === 'chars');
             document.getElementById('tab-words').classList.toggle('active-tab', type === 'words');
-            renderRanking(type);
+            const rows = rankings[type].slice(0, 5).map((r, i) => `<tr><td>${i+1}º</td><td>${r.name}</td><td>${r.score}</td></tr>`).join('');
+            document.getElementById('rank-rows').innerHTML = rows || '<tr><td colspan="3">Sem recordes</td></tr>';
         }
 
-        function resetToMenu() {
-            document.getElementById('screen-over').classList.add('hidden');
-            document.getElementById('screen-game').classList.add('hidden');
-            document.getElementById('screen-menu').classList.remove('hidden');
-            renderRanking(currentRankTab);
-        }
-
-        function speak(t) { const u = new SpeechSynthesisUtterance(t); u.lang = 'ja-JP'; window.speechSynthesis.speak(u); }
-        function toggleWordsMenu() { document.getElementById('words-menu').classList.toggle('hidden'); }
         function updateStats() {
-            const hearts = '❤️'.repeat(3 - state.globalErrors) + '🖤'.repeat(state.globalErrors);
-            document.getElementById('life-icons').textContent = hearts;
+            document.getElementById('life-icons').textContent = '❤️'.repeat(3 - state.globalErrors) + '🖤'.repeat(state.globalErrors);
             document.getElementById('hit-count').textContent = state.hits;
         }
 
-        renderRanking('chars');
+        switchRankTab('chars');
         document.getElementById('answer-input').addEventListener('keypress', e => e.key === 'Enter' && checkAnswer());
     </script>
 </body>
